@@ -1,3 +1,4 @@
+//This is just a random collection of useful stuff that doesnt really have anything to do with mcp
 package mcpwrapper
 
 import (
@@ -9,6 +10,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"encoding/json"
+	"fmt"
 )
 
 func downloadFile(url string, file string) error {
@@ -38,7 +41,7 @@ func download(url string) ([]byte, error) {
 		return bodyBytes, nil
 	}
 
-	return nil, errors.New("failed to download file")
+	return nil, errors.New(resp.Status + " : " + url)
 }
 
 func makeDir(fileName string) {
@@ -91,6 +94,14 @@ func writeStringToFile(str string, file string) error {
 	return ioutil.WriteFile(file, []byte(str), os.ModePerm)
 }
 
+func readStringFromFile(file string) string {
+	b, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return string(b)
+}
+
 func divideString2(str string) (string, string) {
 	split := strings.Split(str, " ")
 	return split[0], split[1]
@@ -104,4 +115,18 @@ func divideString3(str string) (string, string, string) {
 func divideString4(str string) (string, string, string, string) {
 	split := strings.Split(str, " ")
 	return split[0], split[1], split[2], split[3]
+}
+
+func printAsJson(v interface{}) {
+	fmt.Println(toJson(v))
+}
+
+func toJson(v interface{}) string {
+	json, _ := json.Marshal(v)
+	return string(json)
+}
+
+func splitAtLastSlash(input string) (string, string) {
+	lastPos := strings.LastIndex(input, "/")
+	return input[:lastPos], input[lastPos:]
 }

@@ -8,7 +8,19 @@ import (
 	"strings"
 )
 
-func PrepareMCPConfig(version string) error {
+func getMCPConfigData(version string) (MCPData, error) {
+	var data MCPData
+	if !fileExists(mcpConfigSRGLocation(version)) {
+		err := prepareMCPConfig(version)
+		if err != nil {
+			return data, err
+		}
+	}
+	data = buildMCPConfigData(version)
+	return data, nil
+}
+
+func prepareMCPConfig(version string) error {
 	url := fmt.Sprintf("http://files.minecraftforge.net/maven/de/oceanlabs/mcp/mcp_config/%s/mcp_config-%s.zip", version, version)
 	archivePath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s.zip", version))
 	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s", version))
@@ -24,17 +36,17 @@ func PrepareMCPConfig(version string) error {
 	}
 
 	tiny_srg := filepath.Join(extractedPath, "config", "joined.tsrg")
-	return convertToSRG(tiny_srg, MCPConfigSRGLocation(version))
+	return convertToSRG(tiny_srg, mcpConfigSRGLocation(version))
 }
 
-func MCPConfigSRGLocation(version string) string {
+func mcpConfigSRGLocation(version string) string {
 	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s", version))
 	srg := filepath.Join(extractedPath, "joined.srg")
 	return srg
 }
 
-func GetMCPConfigData(version string) MCPData {
-	return ReadMCPData(MCPConfigSRGLocation(version))
+func buildMCPConfigData(version string) MCPData {
+	return ReadMCPData(mcpConfigSRGLocation(version))
 }
 
 func convertToSRG(tsrg string, srg string) error {

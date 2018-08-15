@@ -2,7 +2,7 @@ package mcpwrapper
 
 import (
 	"github.com/modmuss50/goutils"
-	"strings"
+	"encoding/json"
 )
 
 type MCPData struct {
@@ -53,7 +53,40 @@ func ReadMCPData(srgFile string) MCPData {
 	return data
 }
 
-func splitAtLastSlash(input string) (string, string) {
-	lastPos := strings.LastIndex(input, "/")
-	return input[:lastPos], input[lastPos:]
+//Only use the file version in the tests, use the version hosted on github when using on a production server so you can add new versions without needing to update
+func ReadMCPVersionsFromFile(file string) MCPVersionJson {
+	return ReadMCPVersions(readStringFromFile(file))
+}
+
+func ReadMCPVersions(str string) MCPVersionJson {
+	versionData := MCPVersionJson{}
+	json.Unmarshal([]byte(str), &versionData)
+	return versionData
+}
+
+type MCPVersionJson struct {
+	Versions []MCPVersion `json:"versions"`
+}
+
+type MCPVersion struct {
+	MinecraftVersion string `json:"mcVersion"`
+	MCPType          string `json:"type"`
+}
+
+func GetMCPData(version MCPVersion) (MCPData, error) {
+	var data MCPData
+	if version.MCPType == "mcp_config" {
+		d, err := getMCPConfigData(version.MinecraftVersion)
+		if err != nil {
+			return data, err
+		}
+		data = d
+	} else if version.MCPType == "mcp_legacy" {
+		d, err := getMCPLeagcyData(version.MinecraftVersion)
+		if err != nil {
+			return data, err
+		}
+		data = d
+	}
+	return data, nil
 }

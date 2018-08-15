@@ -1,0 +1,64 @@
+{
+  "versions": [
+    {
+      "mcVersion": "1.13",
+      "type": "mcp_config"
+    },
+    {
+      "mcVersion": "1.12.2",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.12.1",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.12",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.12.2",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.11.2",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.11",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.10.2",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.10",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.9.4",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.9",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.8.9",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.8.8",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.8",
+      "type": "mcp_legacy"
+    },
+    {
+      "mcVersion": "1.7.10",
+      "type": "mcp_legacy"
+    }
+  ]
+}
