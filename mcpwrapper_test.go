@@ -24,3 +24,12 @@ func TestPrepareAll(t *testing.T) {
 		fmt.Printf("%d Methods \n", len(data.Methods))
 	}
 }
+
+func TestGetMCPBotVersions(t *testing.T) {
+	data, err := GetMCPBotVersions()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	printAsJson(data)
+}
