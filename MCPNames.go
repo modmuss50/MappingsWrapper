@@ -108,7 +108,11 @@ func readExport(version string, data MCPBotExports) (MCPBotExport, error) {
 
 func readLines(handle func(line string), file string) {
 	lines := goutils.ReadLinesFromFile(file)
-	for _, line := range lines {
+	for i, line := range lines {
+		if i == 0 {
+			//Skip over the first line as its just the headers for the csv
+			continue
+		}
 		handle(line)
 	}
 }
