@@ -7,28 +7,28 @@ import (
 	"path/filepath"
 )
 
-type MCPBotExport struct {
-	MCVersion string         `json:"minecraftVersion"`
-	Fields    []FieldExport  `json:"fields"`
-	Methods   []MethodExport `json:"methods"`
-	Params    []ParamExport  `json:"params"`
+type SRGNames struct {
+	MCVersion string      `json:"minecraftVersion"`
+	Fields    []SRGField  `json:"fields"`
+	Methods   []SRGMethod `json:"methods"`
+	Params    []SRGParm   `json:"params"`
 }
 
-type FieldExport struct {
+type SRGField struct {
 	Searge string `json:"searge"`
 	Name   string `json:"name"`
 	Side   string `json:"side"`
 	Desc   string `json:"desc"`
 }
 
-type MethodExport struct {
+type SRGMethod struct {
 	Searge string `json:"searge"`
 	Name   string `json:"name"`
 	Side   string `json:"side"`
 	Desc   string `json:"desc"`
 }
 
-type ParamExport struct {
+type SRGParm struct {
 	Searge string `json:"searge"`
 	Name   string `json:"name"`
 	Side   string `json:"side"`
@@ -36,8 +36,8 @@ type ParamExport struct {
 
 // http://export.mcpbot.bspk.rs/mcp_snapshot/20180815-1.13/mcp_snapshot-20180815-1.13.zip
 
-func DownloadExport(version string) (MCPBotExport, error) {
-	var export = MCPBotExport{}
+func GetSRGNames(version string) (SRGNames, error) {
+	var export = SRGNames{}
 	data, err := GetMCPBotVersions()
 	if err != nil {
 		return export, err
@@ -65,8 +65,8 @@ func DownloadExport(version string) (MCPBotExport, error) {
 	return readExport(version, data)
 }
 
-func readExport(version string, data MCPBotExports) (MCPBotExport, error) {
-	var export = MCPBotExport{}
+func readExport(version string, data MCPBotExports) (SRGNames, error) {
+	var export = SRGNames{}
 	mcVersion, err := GetMCVersionFromExport(version, data)
 	if err != nil {
 		return export, err
@@ -88,15 +88,15 @@ func readExport(version string, data MCPBotExports) (MCPBotExport, error) {
 
 	handleFields := func(line string) {
 		searge, name, side, desc := splitString4(line, ",")
-		export.Fields = append(export.Fields, FieldExport{Searge: searge, Name: name, Side: side, Desc: desc})
+		export.Fields = append(export.Fields, SRGField{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleMethods := func(line string) {
 		searge, name, side, desc := splitString4(line, ",")
-		export.Methods = append(export.Methods, MethodExport{Searge: searge, Name: name, Side: side, Desc: desc})
+		export.Methods = append(export.Methods, SRGMethod{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleParam := func(line string) {
 		searge, name, side := splitString3(line, ",")
-		export.Params = append(export.Params, ParamExport{Searge: searge, Name: name, Side: side})
+		export.Params = append(export.Params, SRGParm{Searge: searge, Name: name, Side: side})
 	}
 
 	readLines(handleFields, fieldsCsv)
@@ -104,6 +104,53 @@ func readExport(version string, data MCPBotExports) (MCPBotExport, error) {
 	readLines(handleParam, paramsCsv)
 
 	return export, nil
+}
+
+func GetSemiLiveNames() (SRGNames, error) {
+	var export = SRGNames{}
+	handleFields := func(line string) {
+		searge, name, side, desc := splitString4(line, ",")
+		export.Fields = append(export.Fields, SRGField{Searge: searge, Name: name, Side: side, Desc: desc})
+	}
+	handleMethods := func(line string) {
+		searge, name, side, desc := splitString4(line, ",")
+		export.Methods = append(export.Methods, SRGMethod{Searge: searge, Name: name, Side: side, Desc: desc})
+	}
+	handleParam := func(line string) {
+		searge, name, side := splitString3(line, ",")
+		export.Params = append(export.Params, SRGParm{Searge: searge, Name: name, Side: side})
+	}
+	err := downloadSemiLive("fields.csv", handleFields)
+	if err != nil {
+		return export, err
+	}
+	err = downloadSemiLive("methods.csv", handleMethods)
+	if err != nil {
+		return export, err
+	}
+	err = downloadSemiLive("params.csv", handleParam)
+	if err != nil {
+		return export, err
+	}
+
+	export.MCVersion = "semi-live" //TODO get the latest exported version?
+
+	return export, nil
+}
+
+func downloadSemiLive(file string, handle func(line string)) error {
+	downloadDir := filepath.Join(MCPDataDir, "semi-live")
+	makeDir(downloadDir)
+	csv := filepath.Join(downloadDir, file)
+	if fileExists(csv) {
+		deleteFile(file)
+	}
+	err := downloadFile(fmt.Sprintf("http://export.mcpbot.bspk.rs/%s", file), csv)
+	if err != nil {
+		return err
+	}
+	readLines(handle, csv)
+	return nil
 }
 
 func readLines(handle func(line string), file string) {

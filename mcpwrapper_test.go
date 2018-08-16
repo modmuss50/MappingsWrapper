@@ -61,7 +61,7 @@ func TestGetMCVersionFromExport(t *testing.T) {
 }
 
 func TestDownloadExport(t *testing.T) {
-	data, err := DownloadExport("snapshot_20180815")
+	data, err := GetSRGNames("snapshot_20180815")
 	if err != nil {
 		t.Error(err)
 		return
@@ -71,7 +71,19 @@ func TestDownloadExport(t *testing.T) {
 	fmt.Printf("%d srg method names \n", len(data.Methods))
 	fmt.Printf("%d srg params names \n", len(data.Params))
 
-	data, err = DownloadExport("stable_39")
+	data, err = GetSRGNames("stable_39")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Println(data.MCVersion)
+	fmt.Printf("%d srg field names \n", len(data.Fields))
+	fmt.Printf("%d srg method names \n", len(data.Methods))
+	fmt.Printf("%d srg params names \n", len(data.Params))
+}
+
+func TestGetSemiLive(t *testing.T) {
+	data, err := GetSemiLiveNames()
 	if err != nil {
 		t.Error(err)
 		return

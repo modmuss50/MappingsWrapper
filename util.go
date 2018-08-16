@@ -79,6 +79,11 @@ func deleteDir(dir string) error {
 	return nil
 }
 
+func deleteFile(path string) error {
+	var err = os.Remove(path)
+	return err
+}
+
 func fileExists(file string) bool {
 	if _, err := os.Stat(file); err == nil {
 		return true
