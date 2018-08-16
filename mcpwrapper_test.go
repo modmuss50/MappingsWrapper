@@ -6,7 +6,7 @@ import (
 )
 
 func Test_setup(t *testing.T) {
-	//deleteDir(DataDir)
+	//deleteDir(SRGDataDir)
 	checkDirs()
 }
 
@@ -32,4 +32,52 @@ func TestGetMCPBotVersions(t *testing.T) {
 		return
 	}
 	printAsJson(data)
+}
+
+func TestGetMCVersionFromExport(t *testing.T) {
+	data, err := GetMCPBotVersions()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	mcVersion, err := GetMCVersionFromExport("snapshot_20180604", data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if mcVersion != "1.12" {
+		t.Fail()
+		return
+	}
+	mcVersion, err = GetMCVersionFromExport("stable_22", data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if mcVersion != "1.8.9" {
+		t.Fail()
+		return
+	}
+}
+
+func TestDownloadExport(t *testing.T) {
+	data, err := DownloadExport("snapshot_20180815")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Println(data.MCVersion)
+	fmt.Printf("%d srg field names \n", len(data.Fields))
+	fmt.Printf("%d srg method names \n", len(data.Methods))
+	fmt.Printf("%d srg params names \n", len(data.Params))
+
+	data, err = DownloadExport("stable_39")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Println(data.MCVersion)
+	fmt.Printf("%d srg field names \n", len(data.Fields))
+	fmt.Printf("%d srg method names \n", len(data.Methods))
+	fmt.Printf("%d srg params names \n", len(data.Params))
 }

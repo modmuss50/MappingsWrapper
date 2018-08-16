@@ -2,7 +2,9 @@
 package mcpwrapper
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/mholt/archiver"
 	"io/ioutil"
 	"net/http"
@@ -10,8 +12,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"encoding/json"
-	"fmt"
 )
 
 func downloadFile(url string, file string) error {
@@ -103,17 +103,29 @@ func readStringFromFile(file string) string {
 }
 
 func divideString2(str string) (string, string) {
-	split := strings.Split(str, " ")
+	return splitString2(str, " ")
+}
+
+func splitString2(str string, sep string) (string, string) {
+	split := strings.Split(str, sep)
 	return split[0], split[1]
 }
 
 func divideString3(str string) (string, string, string) {
-	split := strings.Split(str, " ")
+	return splitString3(str, " ")
+}
+
+func splitString3(str string, sep string) (string, string, string) {
+	split := strings.Split(str, sep)
 	return split[0], split[1], split[2]
 }
 
 func divideString4(str string) (string, string, string, string) {
-	split := strings.Split(str, " ")
+	return splitString4(str, " ")
+}
+
+func splitString4(str string, sep string) (string, string, string, string) {
+	split := strings.Split(str, sep)
 	return split[0], split[1], split[2], split[3]
 }
 

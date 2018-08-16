@@ -9,19 +9,19 @@ import (
 	"sort"
 )
 
-type MCPBotVersions struct {
-	Versions []MCPBotVersion `json:"versions"`
+type MCPBotExports struct {
+	Versions []MCPBotVersionExports `json:"exports"`
 }
 
-type MCPBotVersion struct {
-	MCVersion string   `json:"mcVersion"`
+type MCPBotVersionExports struct {
+	MCVersion string   `json:"minecraftVersion"`
 	Snapshots []string `json:"snapshots"`
 	Stable    []string `json:"stable"`
 }
 
-func GetMCPBotVersions() (MCPBotVersions, error) {
+func GetMCPBotVersions() (MCPBotExports, error) {
 	versionsURL := "http://export.mcpbot.bspk.rs/versions.json"
-	var botData = MCPBotVersions{}
+	var botData = MCPBotExports{}
 	versionsJSON, err := goutils.DownloadString(versionsURL)
 	if err != nil {
 		return botData, err
@@ -29,7 +29,7 @@ func GetMCPBotVersions() (MCPBotVersions, error) {
 	data := goutils.GetDataMap(versionsJSON)
 	for mcVersion, element := range data {
 		versionElement := jsonq.NewQuery(element)
-		var versionData = MCPBotVersion{}
+		var versionData = MCPBotVersionExports{}
 		versionData.MCVersion = mcVersion
 
 		val, err := handleBranch("snapshot", versionElement, versionData.Snapshots)
@@ -63,8 +63,8 @@ func handleBranch(branch string, json *jsonq.JsonQuery, target []string) ([]stri
 	return value, nil
 }
 
-func sortData(data MCPBotVersions) (MCPBotVersions, error) {
-	var botData = MCPBotVersions{}
+func sortData(data MCPBotExports) (MCPBotExports, error) {
+	var botData = MCPBotExports{}
 	vs := make([]*semver.Version, len(data.Versions))
 	for i, r := range data.Versions {
 		v, err := semver.NewVersion(r.MCVersion)
@@ -86,11 +86,11 @@ func sortData(data MCPBotVersions) (MCPBotVersions, error) {
 	return botData, nil
 }
 
-func GetVersionData(version string, botData MCPBotVersions) (MCPBotVersion, error) {
+func GetVersionData(version string, botData MCPBotExports) (MCPBotVersionExports, error) {
 	for _, entry := range botData.Versions {
 		if entry.MCVersion == version {
 			return entry, nil
 		}
 	}
-	return MCPBotVersion{}, errors.New("version not found")
+	return MCPBotVersionExports{}, errors.New("version not found")
 }

@@ -19,8 +19,8 @@ func getMCPLeagcyData(version string) (MCPData, error) {
 
 func prepareMCPLegacy(version string) error {
 	url := fmt.Sprintf("http://files.minecraftforge.net/maven/de/oceanlabs/mcp/mcp/%s/mcp-%s-srg.zip", version, version)
-	archivePath := filepath.Join(DataDir, fmt.Sprintf("mcp-%s-srg.zip", version))
-	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp-%s-srg", version))
+	archivePath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-srg.zip", version))
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-srg", version))
 	err := downloadFile(url, archivePath)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func buildMCPLegacyData(version string) MCPData {
 }
 
 func mcpLegacySRGLocation(version string) string {
-	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp-%s-srg", version))
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-srg", version))
 	srg := filepath.Join(extractedPath, "joined.srg")
 	return srg
 }

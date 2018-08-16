@@ -1,11 +1,13 @@
 package mcpwrapper
 
 var (
-	DataDir = "data"
+	SRGDataDir = "srg"
+	MCPDataDir = "mcp"
 )
 
 func checkDirs() {
-	makeDir(DataDir)
+	makeDir(SRGDataDir)
+	makeDir(MCPDataDir)
 }
 
 func todos() {

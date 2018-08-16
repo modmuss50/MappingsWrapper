@@ -22,8 +22,8 @@ func getMCPConfigData(version string) (MCPData, error) {
 
 func prepareMCPConfig(version string) error {
 	url := fmt.Sprintf("http://files.minecraftforge.net/maven/de/oceanlabs/mcp/mcp_config/%s/mcp_config-%s.zip", version, version)
-	archivePath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s.zip", version))
-	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s", version))
+	archivePath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s.zip", version))
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s", version))
 
 	err := downloadFile(url, archivePath)
 	if err != nil {
@@ -40,7 +40,7 @@ func prepareMCPConfig(version string) error {
 }
 
 func mcpConfigSRGLocation(version string) string {
-	extractedPath := filepath.Join(DataDir, fmt.Sprintf("mcp_config-%s", version))
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s", version))
 	srg := filepath.Join(extractedPath, "joined.srg")
 	return srg
 }
