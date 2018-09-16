@@ -149,3 +149,61 @@ func TestMethodAccessTransformer(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestFieldLookup(t *testing.T) {
+	//field_193960_m
+
+	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	srgs, err := GetSRGNames("snapshot_20180916")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	fields, err := LookupField("field_193960_m", mcp, srgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	for _, field := range fields {
+		fmt.Println(FieldInfoToString(field))
+	}
+}
+
+func TestFieldAccessTransformer(t *testing.T) {
+	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	srgs, err := GetSRGNames("snapshot_20180916")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	fields, err := LookupField("field_193022_s", mcp, srgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(fields) == 0 {
+		t.Fail()
+	}
+
+	at := MakeFieldAccessTransformer(fields[0])
+
+	fmt.Println(at)
+
+	if at != "public net.minecraft.client.gui.recipebook.GuiRecipeBook field_193022_s # recipeBookPage" {
+		t.Fail()
+	}
+}
