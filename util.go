@@ -145,5 +145,5 @@ func toJson(v interface{}) string {
 
 func splitAtLastSlash(input string) (string, string) {
 	lastPos := strings.LastIndex(input, "/")
-	return input[:lastPos], input[lastPos:]
+	return input[:lastPos], input[lastPos+1:]
 }

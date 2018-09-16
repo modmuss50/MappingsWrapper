@@ -93,3 +93,59 @@ func TestGetSemiLive(t *testing.T) {
 	fmt.Printf("%d srg method names \n", len(data.Methods))
 	fmt.Printf("%d srg params names \n", len(data.Params))
 }
+
+func TestMethodLook(t *testing.T) {
+	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.12.2", MCPType: "mcp_legacy"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	srgs, err := GetSRGNames("stable_39")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	methods, err := LookupMethod("func_189667_a", mcp, srgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	for _, method := range methods {
+		fmt.Println(MethodInfoToString(method))
+	}
+}
+
+func TestMethodAccessTransformer(t *testing.T) {
+	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	srgs, err := GetSRGNames("snapshot_20180916")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	methods, err := LookupMethod("func_72923_a", mcp, srgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(methods) == 0 {
+		t.Fail()
+	}
+
+	at := MakeMethodAccessTransformer(methods[0])
+
+	fmt.Println(at)
+
+	if at != "public net.minecraft.world.World func_72923_a(Lnet/minecraft/entity/Entity;)V # onEntityAdded" {
+		t.Fail()
+	}
+}

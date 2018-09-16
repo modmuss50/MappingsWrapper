@@ -33,6 +33,8 @@ func GenerateDiff(oldMappings SRGNames, newMappings SRGNames) MCPDiff {
 	//TODO find all new things, and if not found add to lost
 
 	//TODO find all changed, add the changes
+
+	return MCPDiff{}
 }
 
 func DiffToString(diff MCPData) {

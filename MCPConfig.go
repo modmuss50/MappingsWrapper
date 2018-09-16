@@ -70,7 +70,7 @@ func convertToSRG(tsrg string, srg string) error {
 				//METHOD
 				classNotch, classSrg := divideString2(class)
 				methodNotch, methodDesc, methodSrg := divideString3(line[1:])
-				srgDesc := "(?)unknown;" //TODO remap method desc
+				srgDesc := remapDesc(methodDesc) //TODO remap method desc
 
 				outputLines = append(outputLines, fmt.Sprintf("MD: %s/%s %s %s/%s %s", classNotch, methodNotch, methodDesc, classSrg, methodSrg, srgDesc))
 			}
@@ -78,4 +78,29 @@ func convertToSRG(tsrg string, srg string) error {
 	}
 	sort.Strings(outputLines)
 	return writeStringToFile(strings.Join(outputLines, "\n"), srg)
+}
+
+//TODO
+// (Laeo;)V > (Lnet/minecraft/entity/Entity;)V
+func remapDesc(input string) string {
+	result := ""
+	class := ""
+	for i, _ := range input {
+		c := input[i]
+		//braces dont need anything doing to them
+		if c == '(' {
+			result += string(c)
+		} else if c == ')' {
+			result += string(c)
+		} else if c == ';' || c == 'L' { //Upper case
+			if len(class) > 0 {
+				fmt.Println("remap class:       " + class + "         (" + input)
+			}
+			class = ""
+			result += string(c)
+		} else {
+			class += string(c)
+		}
+	}
+	return "(?)unknown;"
 }
