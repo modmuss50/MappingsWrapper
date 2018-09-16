@@ -55,6 +55,5 @@ func MethodInfoToString(info MethodInfo) string {
 
 //public net.minecraft.village.VillageCollection func_75549_c()V # removeAnnihilatedVillages
 func MakeMethodAccessTransformer(info MethodInfo) string {
-	//TODO use deobof desc
-	return fmt.Sprintf("public %s %s%s # %s", strings.Replace(info.ClassData.DeobfName, "/", ".", -1), info.Searge, info.ObofDesc, info.Mcp)
+	return fmt.Sprintf("public %s %s%s # %s", strings.Replace(info.ClassData.DeobfName, "/", ".", -1), info.Searge, info.DeobfDesc, info.Mcp)
 }

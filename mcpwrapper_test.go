@@ -145,7 +145,7 @@ func TestMethodAccessTransformer(t *testing.T) {
 
 	fmt.Println(at)
 
-	if at != "public net.minecraft.world.World func_72923_a(Lnet/minecraft/entity/Entity;)V # onEntityAdded" {
+	if at != "public net.minecraft.world.WorldServer func_72923_a(Lnet/minecraft/entity/Entity;)V # onEntityAdded" {
 		t.Fail()
 	}
 }

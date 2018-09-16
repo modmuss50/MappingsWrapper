@@ -1,11 +1,14 @@
 package mcpwrapper
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/modmuss50/goutils"
+	"gopkg.in/src-d/go-git.v4"
+	"io"
+	"log"
+	"os"
+	"os/exec"
 	"path/filepath"
-	"sort"
-	"strings"
 )
 
 func getMCPConfigData(version string) (MCPData, error) {
@@ -21,22 +24,42 @@ func getMCPConfigData(version string) (MCPData, error) {
 }
 
 func prepareMCPConfig(version string) error {
-	url := fmt.Sprintf("http://files.minecraftforge.net/maven/de/oceanlabs/mcp/mcp_config/%s/mcp_config-%s.zip", version, version)
-	archivePath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s.zip", version))
+
 	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s", version))
 
-	err := downloadFile(url, archivePath)
+	fmt.Println("Cloning MCP Config")
+
+	_, err := git.PlainClone(extractedPath, false, &git.CloneOptions{
+		URL:      "https://github.com/MinecraftForge/MCPConfig",
+		Progress: os.Stdout,
+	})
+
 	if err != nil {
 		return err
 	}
 
-	err = extractZip(archivePath, extractedPath)
-	if err != nil {
-		return err
+	fmt.Println("Making SRG")
+
+	//TODO linux
+	cmd := exec.Command("cmd", "/c", "gradlew", version+":makeSrg")
+	cmd.Dir = extractedPath
+
+	var stdBuffer bytes.Buffer
+	mw := io.MultiWriter(os.Stdout, &stdBuffer)
+
+	cmd.Stdout = mw
+	cmd.Stderr = mw
+
+	if err := cmd.Run(); err != nil {
+		log.Panic(err)
 	}
 
-	tiny_srg := filepath.Join(extractedPath, "config", "joined.tsrg")
-	return convertToSRG(tiny_srg, mcpConfigSRGLocation(version))
+	log.Println(stdBuffer.String())
+
+	srgPath := filepath.Join(extractedPath, "build/versions/1.13/data/joined.srg")
+
+	copyFile(srgPath, mcpConfigSRGLocation(version))
+	return nil
 }
 
 func mcpConfigSRGLocation(version string) string {
@@ -47,60 +70,4 @@ func mcpConfigSRGLocation(version string) string {
 
 func buildMCPConfigData(version string) MCPData {
 	return ReadMCPData(mcpConfigSRGLocation(version))
-}
-
-func convertToSRG(tsrg string, srg string) error {
-	lines := goutils.ReadLinesFromFile(tsrg)
-	var outputLines []string
-
-	class := ""
-	for _, line := range lines {
-		if line[0] != '	' {
-			//Hey we have a class
-			outputLines = append(outputLines, "CL: "+line)
-			class = line
-		} else {
-			split := strings.Split(line[1:], " ")
-			if len(split) == 2 {
-				//FIELD
-				classNotch, classSrg := divideString2(class)
-				fieldNotch, fieldSrg := divideString2(line[1:])
-				outputLines = append(outputLines, fmt.Sprintf("FD: %s/%s %s/%s", classNotch, fieldNotch, classSrg, fieldSrg))
-			} else if len(split) == 3 {
-				//METHOD
-				classNotch, classSrg := divideString2(class)
-				methodNotch, methodDesc, methodSrg := divideString3(line[1:])
-				srgDesc := remapDesc(methodDesc) //TODO remap method desc
-
-				outputLines = append(outputLines, fmt.Sprintf("MD: %s/%s %s %s/%s %s", classNotch, methodNotch, methodDesc, classSrg, methodSrg, srgDesc))
-			}
-		}
-	}
-	sort.Strings(outputLines)
-	return writeStringToFile(strings.Join(outputLines, "\n"), srg)
-}
-
-//TODO
-// (Laeo;)V > (Lnet/minecraft/entity/Entity;)V
-func remapDesc(input string) string {
-	result := ""
-	class := ""
-	for i, _ := range input {
-		c := input[i]
-		//braces dont need anything doing to them
-		if c == '(' {
-			result += string(c)
-		} else if c == ')' {
-			result += string(c)
-		} else if c == ';' || c == 'L' { //Upper case
-			if len(class) > 0 {
-				fmt.Println("remap class:       " + class + "         (" + input)
-			}
-			class = ""
-			result += string(c)
-		} else {
-			class += string(c)
-		}
-	}
-	return "(?)unknown;"
 }

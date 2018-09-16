@@ -91,6 +91,18 @@ func fileExists(file string) bool {
 	return false
 }
 
+func copyFile(src string, dst string) error {
+	data, err := ioutil.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(dst, data, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func extractZip(zip string, dest string) error {
 	return archiver.Zip.Open(zip, dest)
 }
