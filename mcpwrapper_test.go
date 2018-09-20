@@ -2,7 +2,6 @@ package mcpwrapper
 
 import (
 	"fmt"
-	"path/filepath"
 	"testing"
 )
 
@@ -13,7 +12,7 @@ func Test_setup(t *testing.T) {
 
 func TestPrepare(t *testing.T) {
 	//Delete the dir to ensure that we always test a full clone + build
-	deleteDir(filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", "1.13.1")))
+	//deleteDir(filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", "1.13.1")))
 
 	data, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13.1", MCPType: "mcp_config"})
 	if err != nil {
@@ -225,7 +224,7 @@ func TestFieldAccessTransformer(t *testing.T) {
 }
 
 func TestDiffGeneration(t *testing.T) {
-	oldSRG, err := GetSRGNames("snapshot_20180915")
+	oldSRG, err := GetSRGNames("snapshot_20180910")
 	if err != nil {
 		t.Error(err)
 		return

@@ -11,7 +11,7 @@ type SRGNames struct {
 	MCVersion string      `json:"minecraftVersion"`
 	Fields    []SRGField  `json:"fields"`
 	Methods   []SRGMethod `json:"methods"`
-	Params    []SRGParm   `json:"params"`
+	Params    []SRGParam  `json:"params"`
 }
 
 type SRGField struct {
@@ -28,7 +28,7 @@ type SRGMethod struct {
 	Desc   string `json:"desc"`
 }
 
-type SRGParm struct {
+type SRGParam struct {
 	Searge string `json:"searge"`
 	Name   string `json:"name"`
 	Side   string `json:"side"`
@@ -96,7 +96,7 @@ func readExport(version string, data MCPBotExports) (SRGNames, error) {
 	}
 	handleParam := func(line string) {
 		searge, name, side := splitString3(line, ",")
-		export.Params = append(export.Params, SRGParm{Searge: searge, Name: name, Side: side})
+		export.Params = append(export.Params, SRGParam{Searge: searge, Name: name, Side: side})
 	}
 
 	readLines(handleFields, fieldsCsv)
@@ -118,7 +118,7 @@ func GetSemiLiveNames() (SRGNames, error) {
 	}
 	handleParam := func(line string) {
 		searge, name, side := splitString3(line, ",")
-		export.Params = append(export.Params, SRGParm{Searge: searge, Name: name, Side: side})
+		export.Params = append(export.Params, SRGParam{Searge: searge, Name: name, Side: side})
 	}
 	err := downloadSemiLive("fields.csv", handleFields)
 	if err != nil {

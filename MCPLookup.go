@@ -107,3 +107,30 @@ func FieldInfoToString(info FieldInfo) string {
 func MakeFieldAccessTransformer(info FieldInfo) string {
 	return fmt.Sprintf("public %s %s # %s", strings.Replace(info.ClassData.DeobfName, "/", ".", -1), info.Searge, info.Mcp)
 }
+
+func FindMethodSRGName(name string, srgs SRGNames) (SRGMethod, error) {
+	for _, method := range srgs.Methods {
+		if method.Searge == name {
+			return method, nil
+		}
+	}
+	return SRGMethod{}, errors.New("failed to find method in names")
+}
+
+func FindFieldSRGName(name string, srgs SRGNames) (SRGField, error) {
+	for _, field := range srgs.Fields {
+		if field.Searge == name {
+			return field, nil
+		}
+	}
+	return SRGField{}, errors.New("failed to find field in names")
+}
+
+func FindParamSRGName(name string, srgs SRGNames) (SRGParam, error) {
+	for _, param := range srgs.Params {
+		if param.Searge == name {
+			return param, nil
+		}
+	}
+	return SRGParam{}, errors.New("failed to find param in names")
+}
