@@ -37,6 +37,8 @@ func GenerateDiff(oldMappings SRGNames, newMappings SRGNames) MCPDiff {
 	return MCPDiff{}
 }
 
-func DiffToString(diff MCPData) {
+func DiffToString(diff MCPDiff) string {
 	//Make it a bunch of strings so it can be shown to users
+
+	return ""
 }

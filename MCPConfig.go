@@ -25,9 +25,14 @@ func getMCPConfigData(version string) (MCPData, error) {
 
 func prepareMCPConfig(version string) error {
 
-	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s", version))
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", version))
 
 	fmt.Println("Cloning MCP Config")
+
+	//Handles errors that can be caused if a previous build failed
+	if fileExists(extractedPath) {
+		deleteDir(extractedPath)
+	}
 
 	_, err := git.PlainClone(extractedPath, false, &git.CloneOptions{
 		URL:      "https://github.com/MinecraftForge/MCPConfig",
@@ -56,16 +61,17 @@ func prepareMCPConfig(version string) error {
 
 	log.Println(stdBuffer.String())
 
-	srgPath := filepath.Join(extractedPath, "build/versions/1.13/data/joined.srg")
+	srgPath := filepath.Join(extractedPath, "build", "versions", version, "data", "joined.srg")
 
-	copyFile(srgPath, mcpConfigSRGLocation(version))
-	return nil
+	fmt.Println(srgPath)
+	fmt.Println(mcpConfigSRGLocation(version))
+
+	return copyFile(srgPath, mcpConfigSRGLocation(version))
 }
 
 func mcpConfigSRGLocation(version string) string {
-	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp_config-%s", version))
-	srg := filepath.Join(extractedPath, "joined.srg")
-	return srg
+	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", version), "joined.srg")
+	return extractedPath
 }
 
 func buildMCPConfigData(version string) MCPData {

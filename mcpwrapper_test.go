@@ -2,12 +2,28 @@ package mcpwrapper
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 )
 
 func Test_setup(t *testing.T) {
 	//deleteDir(SRGDataDir)
 	checkDirs()
+}
+
+func TestPrepare(t *testing.T) {
+	//Delete the dir to ensure that we always test a full clone + build
+	deleteDir(filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", "1.13.1")))
+
+	data, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13.1", MCPType: "mcp_config"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Println("1.13.1")
+	fmt.Printf("%d classes \n", len(data.Classes))
+	fmt.Printf("%d Fields \n", len(data.Fields))
+	fmt.Printf("%d Methods \n", len(data.Methods))
 }
 
 func TestPrepareAll(t *testing.T) {
@@ -206,4 +222,24 @@ func TestFieldAccessTransformer(t *testing.T) {
 	if at != "public net.minecraft.client.gui.recipebook.GuiRecipeBook field_193022_s # recipeBookPage" {
 		t.Fail()
 	}
+}
+
+func TestDiffGeneration(t *testing.T) {
+	oldSRG, err := GetSRGNames("snapshot_20180915")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	newSRG, err := GetSRGNames("snapshot_20180916")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	//https://paste.modmuss50.me/view/9e89d3d9 example from old system
+
+	diff := GenerateDiff(oldSRG, newSRG)
+	diffStr := DiffToString(diff)
+
+	fmt.Println(diffStr)
 }

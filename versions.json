@@ -1,6 +1,10 @@
 {
   "versions": [
     {
+      "mcVersion": "1.13.1",
+      "type": "mcp_config"
+    },
+    {
       "mcVersion": "1.13",
       "type": "mcp_config"
     },
