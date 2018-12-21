@@ -1,6 +1,12 @@
 /*
 
+
 !*.go
 !.gitignore
 !README.md
 !versions.json
+!/common
+!/mcp
+!/utils
+!/yarn
+!/tiny

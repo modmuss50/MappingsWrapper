@@ -1,5 +1,5 @@
 //This is just a random collection of useful stuff that doesnt really have anything to do with mcp
-package mcpwrapper
+package utils
 
 import (
 	"encoding/json"
@@ -14,8 +14,8 @@ import (
 	"strings"
 )
 
-func downloadFile(url string, file string) error {
-	bytes, err := download(url)
+func DownloadFile(url string, file string) error {
+	bytes, err := Download(url)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func downloadFile(url string, file string) error {
 	return nil
 }
 
-func download(url string) ([]byte, error) {
+func Download(url string) ([]byte, error) {
 	var client http.Client
 	resp, err := client.Get(url)
 	if err != nil {
@@ -44,11 +44,16 @@ func download(url string) ([]byte, error) {
 	return nil, errors.New(resp.Status + " : " + url)
 }
 
-func makeDir(fileName string) {
+func DownloadString(url string) (string, error) {
+	bytes, err := Download(url)
+	return string(bytes), err
+}
+
+func MakeDir(fileName string) {
 	os.MkdirAll(fileName, os.ModePerm)
 }
 
-func getRunPath() string {
+func GetRunPath() string {
 	ex, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -57,8 +62,8 @@ func getRunPath() string {
 	return exPath
 }
 
-func deleteDir(dir string) error {
-	if !fileExists(dir) {
+func DeleteDir(dir string) error {
+	if !FileExists(dir) {
 		return errors.New("File not found")
 	}
 	d, err := os.Open(dir)
@@ -79,19 +84,19 @@ func deleteDir(dir string) error {
 	return nil
 }
 
-func deleteFile(path string) error {
+func DeleteFile(path string) error {
 	var err = os.Remove(path)
 	return err
 }
 
-func fileExists(file string) bool {
+func FileExists(file string) bool {
 	if _, err := os.Stat(file); err == nil {
 		return true
 	}
 	return false
 }
 
-func copyFile(src string, dst string) error {
+func CopyFile(src string, dst string) error {
 	data, err := ioutil.ReadFile(src)
 	if err != nil {
 		return err
@@ -103,15 +108,15 @@ func copyFile(src string, dst string) error {
 	return nil
 }
 
-func extractZip(zip string, dest string) error {
-	return archiver.Zip.Open(zip, dest)
+func ExtractZip(zip string, dest string) error {
+	return archiver.DefaultZip.Unarchive(zip, dest)
 }
 
-func writeStringToFile(str string, file string) error {
+func WriteStringToFile(str string, file string) error {
 	return ioutil.WriteFile(file, []byte(str), os.ModePerm)
 }
 
-func readStringFromFile(file string) string {
+func ReadStringFromFile(file string) string {
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Print(err)
@@ -119,43 +124,47 @@ func readStringFromFile(file string) string {
 	return string(b)
 }
 
-func divideString2(str string) (string, string) {
-	return splitString2(str, " ")
+func ReadLinesFromFile(fileName string) []string {
+	return strings.Split(ReadStringFromFile(fileName), "\n")
 }
 
-func splitString2(str string, sep string) (string, string) {
+func DivideString2(str string) (string, string) {
+	return SplitString2(str, " ")
+}
+
+func SplitString2(str string, sep string) (string, string) {
 	split := strings.Split(str, sep)
 	return split[0], split[1]
 }
 
-func divideString3(str string) (string, string, string) {
-	return splitString3(str, " ")
+func DivideString3(str string) (string, string, string) {
+	return SplitString3(str, " ")
 }
 
-func splitString3(str string, sep string) (string, string, string) {
+func SplitString3(str string, sep string) (string, string, string) {
 	split := strings.Split(str, sep)
 	return split[0], split[1], split[2]
 }
 
-func divideString4(str string) (string, string, string, string) {
-	return splitString4(str, " ")
+func DivideString4(str string) (string, string, string, string) {
+	return SplitString4(str, " ")
 }
 
-func splitString4(str string, sep string) (string, string, string, string) {
+func SplitString4(str string, sep string) (string, string, string, string) {
 	split := strings.Split(str, sep)
 	return split[0], split[1], split[2], split[3]
 }
 
-func printAsJson(v interface{}) {
-	fmt.Println(toJson(v))
+func PrintAsJson(v interface{}) {
+	fmt.Println(ToJson(v))
 }
 
-func toJson(v interface{}) string {
+func ToJson(v interface{}) string {
 	json, _ := json.Marshal(v)
 	return string(json)
 }
 
-func splitAtLastSlash(input string) (string, string) {
+func SplitAtLastSlash(input string) (string, string) {
 	lastPos := strings.LastIndex(input, "/")
 	return input[:lastPos], input[lastPos+1:]
 }

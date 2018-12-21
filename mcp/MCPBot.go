@@ -1,4 +1,4 @@
-package mcpwrapper
+package mcp
 
 import (
 	"errors"

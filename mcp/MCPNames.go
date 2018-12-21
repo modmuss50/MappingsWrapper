@@ -1,7 +1,9 @@
-package mcpwrapper
+package mcp
 
 import (
 	"fmt"
+	"github.com/modmuss50/MappingsWrapper/common"
+	"github.com/modmuss50/MappingsWrapper/utils"
 	"github.com/modmuss50/goutils"
 	"github.com/pkg/errors"
 	"path/filepath"
@@ -46,20 +48,20 @@ func GetSRGNames(version string) (SRGNames, error) {
 	if err != nil {
 		return export, err
 	}
-	branch, id := splitString2(version, "_")
+	branch, id := utils.SplitString2(version, "_")
 
 	downloadUrl := fmt.Sprintf("http://export.mcpbot.bspk.rs/mcp_%s/%s-%s/mcp_%s-%s-%s.zip", branch, id, mcVersion, branch, id, mcVersion)
 
-	downloadDir := filepath.Join(MCPDataDir, mcVersion, branch)
+	downloadDir := filepath.Join(common.MCPDataDir, mcVersion, branch)
 	downloadPath := filepath.Join(downloadDir, fmt.Sprintf("mcp_%s-%s-%s.zip", branch, id, mcVersion))
 	extractPath := filepath.Join(downloadDir, fmt.Sprintf("mcp_%s-%s-%s", branch, id, mcVersion))
 
-	if !fileExists(downloadPath) {
-		makeDir(downloadDir)
-		downloadFile(downloadUrl, downloadPath)
+	if !utils.FileExists(downloadPath) {
+		utils.MakeDir(downloadDir)
+		utils.DownloadFile(downloadUrl, downloadPath)
 
-		makeDir(extractPath)
-		extractZip(downloadPath, extractPath)
+		utils.MakeDir(extractPath)
+		utils.ExtractZip(downloadPath, extractPath)
 	}
 
 	return readExport(version, data)
@@ -74,28 +76,28 @@ func readExport(version string, data MCPBotExports) (SRGNames, error) {
 
 	export.MCVersion = mcVersion
 
-	branch, id := splitString2(version, "_")
-	downloadDir := filepath.Join(MCPDataDir, mcVersion, branch)
+	branch, id := utils.SplitString2(version, "_")
+	downloadDir := filepath.Join(common.MCPDataDir, mcVersion, branch)
 	extractPath := filepath.Join(downloadDir, fmt.Sprintf("mcp_%s-%s-%s", branch, id, mcVersion))
 
 	fieldsCsv := filepath.Join(extractPath, "fields.csv")
 	methodsCsv := filepath.Join(extractPath, "methods.csv")
 	paramsCsv := filepath.Join(extractPath, "params.csv")
 
-	if !fileExists(fieldsCsv) || !fileExists(methodsCsv) || !fileExists(paramsCsv) {
+	if !utils.FileExists(fieldsCsv) || !utils.FileExists(methodsCsv) || !utils.FileExists(paramsCsv) {
 		return export, errors.New("data not found")
 	}
 
 	handleFields := func(line string) {
-		searge, name, side, desc := splitString4(line, ",")
+		searge, name, side, desc := utils.SplitString4(line, ",")
 		export.Fields = append(export.Fields, SRGField{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleMethods := func(line string) {
-		searge, name, side, desc := splitString4(line, ",")
+		searge, name, side, desc := utils.SplitString4(line, ",")
 		export.Methods = append(export.Methods, SRGMethod{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleParam := func(line string) {
-		searge, name, side := splitString3(line, ",")
+		searge, name, side := utils.SplitString3(line, ",")
 		export.Params = append(export.Params, SRGParam{Searge: searge, Name: name, Side: side})
 	}
 
@@ -109,15 +111,15 @@ func readExport(version string, data MCPBotExports) (SRGNames, error) {
 func GetSemiLiveNames() (SRGNames, error) {
 	var export = SRGNames{}
 	handleFields := func(line string) {
-		searge, name, side, desc := splitString4(line, ",")
+		searge, name, side, desc := utils.SplitString4(line, ",")
 		export.Fields = append(export.Fields, SRGField{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleMethods := func(line string) {
-		searge, name, side, desc := splitString4(line, ",")
+		searge, name, side, desc := utils.SplitString4(line, ",")
 		export.Methods = append(export.Methods, SRGMethod{Searge: searge, Name: name, Side: side, Desc: desc})
 	}
 	handleParam := func(line string) {
-		searge, name, side := splitString3(line, ",")
+		searge, name, side := utils.SplitString3(line, ",")
 		export.Params = append(export.Params, SRGParam{Searge: searge, Name: name, Side: side})
 	}
 	err := downloadSemiLive("fields.csv", handleFields)
@@ -139,13 +141,13 @@ func GetSemiLiveNames() (SRGNames, error) {
 }
 
 func downloadSemiLive(file string, handle func(line string)) error {
-	downloadDir := filepath.Join(MCPDataDir, "semi-live")
-	makeDir(downloadDir)
+	downloadDir := filepath.Join(common.MCPDataDir, "semi-live")
+	utils.MakeDir(downloadDir)
 	csv := filepath.Join(downloadDir, file)
-	if fileExists(csv) {
-		deleteFile(file)
+	if utils.FileExists(csv) {
+		utils.DeleteFile(file)
 	}
-	err := downloadFile(fmt.Sprintf("http://export.mcpbot.bspk.rs/%s", file), csv)
+	err := utils.DownloadFile(fmt.Sprintf("http://export.mcpbot.bspk.rs/%s", file), csv)
 	if err != nil {
 		return err
 	}

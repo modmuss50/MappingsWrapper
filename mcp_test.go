@@ -1,20 +1,23 @@
-package mcpwrapper
+package mapppingswrapper
 
 import (
 	"fmt"
+	"github.com/modmuss50/MappingsWrapper/common"
+	"github.com/modmuss50/MappingsWrapper/mcp"
+	"github.com/modmuss50/MappingsWrapper/utils"
 	"testing"
 )
 
-func Test_setup(t *testing.T) {
+func Test_MCP_Setup(t *testing.T) {
 	//deleteDir(SRGDataDir)
-	checkDirs()
+	common.CheckDirs()
 }
 
-func TestPrepare(t *testing.T) {
+func Test_MCP_Prepare(t *testing.T) {
 	//Delete the dir to ensure that we always test a full clone + build
 	//deleteDir(filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", "1.13.1")))
 
-	data, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13.1", MCPType: "mcp_config"})
+	data, err := mcp.GetMCPData(mcp.MCPVersion{MinecraftVersion: "1.13.1", MCPType: "mcp_config"})
 	if err != nil {
 		t.Error(err)
 		return
@@ -25,10 +28,10 @@ func TestPrepare(t *testing.T) {
 	fmt.Printf("%d Methods \n", len(data.Methods))
 }
 
-func TestPrepareAll(t *testing.T) {
-	versions := ReadMCPVersionsFromFile("versions.json")
+func Test_MCP_PrepareAll(t *testing.T) {
+	versions := mcp.ReadMCPVersionsFromFile("versions.json")
 	for _, version := range versions.Versions {
-		data, err := GetMCPData(version)
+		data, err := mcp.GetMCPData(version)
 		if err != nil {
 			t.Error(err)
 			return
@@ -40,22 +43,22 @@ func TestPrepareAll(t *testing.T) {
 	}
 }
 
-func TestGetMCPBotVersions(t *testing.T) {
-	data, err := GetMCPBotVersions()
+func Test_MCP_GetMCPBotVersions(t *testing.T) {
+	data, err := mcp.GetMCPBotVersions()
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	printAsJson(data)
+	utils.PrintAsJson(data)
 }
 
-func TestGetMCVersionFromExport(t *testing.T) {
-	data, err := GetMCPBotVersions()
+func Test_MCP_GetMCVersionFromExport(t *testing.T) {
+	data, err := mcp.GetMCPBotVersions()
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	mcVersion, err := GetMCVersionFromExport("snapshot_20180604", data)
+	mcVersion, err := mcp.GetMCVersionFromExport("snapshot_20180604", data)
 	if err != nil {
 		t.Error(err)
 		return
@@ -64,7 +67,7 @@ func TestGetMCVersionFromExport(t *testing.T) {
 		t.Fail()
 		return
 	}
-	mcVersion, err = GetMCVersionFromExport("stable_22", data)
+	mcVersion, err = mcp.GetMCVersionFromExport("stable_22", data)
 	if err != nil {
 		t.Error(err)
 		return
@@ -75,8 +78,8 @@ func TestGetMCVersionFromExport(t *testing.T) {
 	}
 }
 
-func TestDownloadExport(t *testing.T) {
-	data, err := GetSRGNames("snapshot_20180815")
+func Test_MCP_DownloadExport(t *testing.T) {
+	data, err := mcp.GetSRGNames("snapshot_20180815")
 	if err != nil {
 		t.Error(err)
 		return
@@ -86,19 +89,7 @@ func TestDownloadExport(t *testing.T) {
 	fmt.Printf("%d srg method names \n", len(data.Methods))
 	fmt.Printf("%d srg params names \n", len(data.Params))
 
-	data, err = GetSRGNames("stable_39")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	fmt.Println(data.MCVersion)
-	fmt.Printf("%d srg field names \n", len(data.Fields))
-	fmt.Printf("%d srg method names \n", len(data.Methods))
-	fmt.Printf("%d srg params names \n", len(data.Params))
-}
-
-func TestGetSemiLive(t *testing.T) {
-	data, err := GetSemiLiveNames()
+	data, err = mcp.GetSRGNames("stable_39")
 	if err != nil {
 		t.Error(err)
 		return
@@ -109,44 +100,56 @@ func TestGetSemiLive(t *testing.T) {
 	fmt.Printf("%d srg params names \n", len(data.Params))
 }
 
-func TestMethodLook(t *testing.T) {
-	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.12.2", MCPType: "mcp_legacy"})
+func Test_MCP_GetSemiLive(t *testing.T) {
+	data, err := mcp.GetSemiLiveNames()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Println(data.MCVersion)
+	fmt.Printf("%d srg field names \n", len(data.Fields))
+	fmt.Printf("%d srg method names \n", len(data.Methods))
+	fmt.Printf("%d srg params names \n", len(data.Params))
+}
+
+func Test_MCP_MethodLook(t *testing.T) {
+	mcpData, err := mcp.GetMCPData(mcp.MCPVersion{MinecraftVersion: "1.12.2", MCPType: "mcp_legacy"})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	srgs, err := GetSRGNames("stable_39")
+	srgs, err := mcp.GetSRGNames("stable_39")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	methods, err := LookupMethod("func_189667_a", mcp, srgs)
+	methods, err := mcp.LookupMethod("func_189667_a", mcpData, srgs)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
 	for _, method := range methods {
-		fmt.Println(MethodInfoToString(method))
+		fmt.Println(mcp.MethodInfoToString(method))
 	}
 }
 
-func TestMethodAccessTransformer(t *testing.T) {
-	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+func Test_MCP_MethodAccessTransformer(t *testing.T) {
+	mcpData, err := mcp.GetMCPData(mcp.MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	srgs, err := GetSRGNames("snapshot_20180916")
+	srgs, err := mcp.GetSRGNames("snapshot_20180916")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	methods, err := LookupMethod("func_72923_a", mcp, srgs)
+	methods, err := mcp.LookupMethod("func_72923_a", mcpData, srgs)
 	if err != nil {
 		t.Error(err)
 		return
@@ -156,7 +159,7 @@ func TestMethodAccessTransformer(t *testing.T) {
 		t.Fail()
 	}
 
-	at := MakeMethodAccessTransformer(methods[0])
+	at := mcp.MakeMethodAccessTransformer(methods[0])
 
 	fmt.Println(at)
 
@@ -165,46 +168,46 @@ func TestMethodAccessTransformer(t *testing.T) {
 	}
 }
 
-func TestFieldLookup(t *testing.T) {
+func Test_MCP_FieldLookup(t *testing.T) {
 	//field_193960_m
 
-	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+	mcpData, err := mcp.GetMCPData(mcp.MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	srgs, err := GetSRGNames("snapshot_20180916")
+	srgs, err := mcp.GetSRGNames("snapshot_20180916")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	fields, err := LookupField("field_193960_m", mcp, srgs)
+	fields, err := mcp.LookupField("field_193960_m", mcpData, srgs)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
 	for _, field := range fields {
-		fmt.Println(FieldInfoToString(field))
+		fmt.Println(mcp.FieldInfoToString(field))
 	}
 }
 
-func TestFieldAccessTransformer(t *testing.T) {
-	mcp, err := GetMCPData(MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
+func Test_MCP_FieldAccessTransformer(t *testing.T) {
+	mcpData, err := mcp.GetMCPData(mcp.MCPVersion{MinecraftVersion: "1.13", MCPType: "mcp_config"})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	srgs, err := GetSRGNames("snapshot_20180916")
+	srgs, err := mcp.GetSRGNames("snapshot_20180916")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	fields, err := LookupField("field_193022_s", mcp, srgs)
+	fields, err := mcp.LookupField("field_193022_s", mcpData, srgs)
 	if err != nil {
 		t.Error(err)
 		return
@@ -214,7 +217,7 @@ func TestFieldAccessTransformer(t *testing.T) {
 		t.Fail()
 	}
 
-	at := MakeFieldAccessTransformer(fields[0])
+	at := mcp.MakeFieldAccessTransformer(fields[0])
 
 	fmt.Println(at)
 
@@ -223,13 +226,13 @@ func TestFieldAccessTransformer(t *testing.T) {
 	}
 }
 
-func TestDiffGeneration(t *testing.T) {
-	oldSRG, err := GetSRGNames("snapshot_20180910")
+func Test_MCP_DiffGeneration(t *testing.T) {
+	oldSRG, err := mcp.GetSRGNames("snapshot_20180910")
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	newSRG, err := GetSRGNames("snapshot_20180916")
+	newSRG, err := mcp.GetSRGNames("snapshot_20180916")
 	if err != nil {
 		t.Error(err)
 		return
@@ -237,8 +240,8 @@ func TestDiffGeneration(t *testing.T) {
 
 	//https://paste.modmuss50.me/view/9e89d3d9 example from old system
 
-	diff := GenerateDiff(oldSRG, newSRG)
-	diffStr := DiffToString(diff)
+	diff := mcp.GenerateDiff(oldSRG, newSRG)
+	diffStr := mcp.DiffToString(diff)
 
 	fmt.Println(diffStr)
 }

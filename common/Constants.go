@@ -1,13 +1,23 @@
-package mcpwrapper
+package common
 
-var (
-	SRGDataDir = "srg"
-	MCPDataDir = "mcp"
+import (
+	"github.com/modmuss50/MappingsWrapper/utils"
+	"path/filepath"
 )
 
-func checkDirs() {
-	makeDir(SRGDataDir)
-	makeDir(MCPDataDir)
+var (
+	DataDir         = "data"
+	SRGDataDir      = filepath.Join(DataDir, "srg")
+	MCPDataDir      = filepath.Join(DataDir, "mcp")
+	YarnDataDir     = filepath.Join(DataDir, "yarn")
+	IntermediaryDir = filepath.Join(DataDir, "intermediary")
+)
+
+func CheckDirs() {
+	utils.MakeDir(SRGDataDir)
+	utils.MakeDir(MCPDataDir)
+	utils.MakeDir(YarnDataDir)
+	utils.MakeDir(IntermediaryDir)
 }
 
 func todos() {

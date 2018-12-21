@@ -1,23 +1,24 @@
-package mcpwrapper
+package mcp
 
 import (
 	"errors"
 	"fmt"
+	"github.com/modmuss50/MappingsWrapper/common"
 	"strings"
 )
 
 type MethodInfo struct {
-	Mcp       string    `json:"mcp"`
-	Searge    string    `json:"searge"`
-	Name      string    `json:"name"`
-	Side      string    `json:"side"`
-	Desc      string    `json:"desc"`
-	ClassData ClassData `json:"classData"`
-	ObofDesc  string    `json:"obofDesc"`
-	DeobfDesc string    `json:"deobfDesc"`
+	Mcp       string           `json:"mcp"`
+	Searge    string           `json:"searge"`
+	Name      string           `json:"name"`
+	Side      string           `json:"side"`
+	Desc      string           `json:"desc"`
+	ClassData common.ClassData `json:"classData"`
+	ObofDesc  string           `json:"obofDesc"`
+	DeobfDesc string           `json:"deobfDesc"`
 }
 
-func LookupMethod(name string, data MCPData, srg SRGNames) ([]MethodInfo, error) {
+func LookupMethod(name string, data common.MapppingData, srg SRGNames) ([]MethodInfo, error) {
 	for _, method := range srg.Methods {
 		if method.Searge == name {
 			return createMethodInfo(method, findMethod(method, data))
@@ -27,8 +28,8 @@ func LookupMethod(name string, data MCPData, srg SRGNames) ([]MethodInfo, error)
 }
 
 //finds the full method data based off an srg method
-func findMethod(method SRGMethod, data MCPData) []MethodData {
-	var methods []MethodData
+func findMethod(method SRGMethod, data common.MapppingData) []common.MethodData {
+	var methods []common.MethodData
 	for _, mcpMethod := range data.Methods {
 		if mcpMethod.DeobfName == method.Searge {
 			methods = append(methods, mcpMethod)
@@ -37,7 +38,7 @@ func findMethod(method SRGMethod, data MCPData) []MethodData {
 	return methods
 }
 
-func createMethodInfo(methodSrg SRGMethod, methodData []MethodData) ([]MethodInfo, error) {
+func createMethodInfo(methodSrg SRGMethod, methodData []common.MethodData) ([]MethodInfo, error) {
 	if len(methodData) == 0 {
 		return []MethodInfo{}, errors.New("Failed to find method data for " + methodSrg.Searge + methodSrg.Desc)
 	}
@@ -59,15 +60,15 @@ func MakeMethodAccessTransformer(info MethodInfo) string {
 }
 
 type FieldInfo struct {
-	Mcp       string    `json:"mcp"`
-	Searge    string    `json:"searge"`
-	Name      string    `json:"name"`
-	Side      string    `json:"side"`
-	Desc      string    `json:"desc"`
-	ClassData ClassData `json:"classData"`
+	Mcp       string           `json:"mcp"`
+	Searge    string           `json:"searge"`
+	Name      string           `json:"name"`
+	Side      string           `json:"side"`
+	Desc      string           `json:"desc"`
+	ClassData common.ClassData `json:"classData"`
 }
 
-func LookupField(name string, data MCPData, srg SRGNames) ([]FieldInfo, error) {
+func LookupField(name string, data common.MapppingData, srg SRGNames) ([]FieldInfo, error) {
 	for _, field := range srg.Fields {
 		if field.Searge == name {
 			return createFieldInfo(field, findField(field, data))
@@ -77,8 +78,8 @@ func LookupField(name string, data MCPData, srg SRGNames) ([]FieldInfo, error) {
 }
 
 //finds the full method data based off an srg method
-func findField(method SRGField, data MCPData) []FieldData {
-	var fields []FieldData
+func findField(method SRGField, data common.MapppingData) []common.FieldData {
+	var fields []common.FieldData
 	for _, mcpField := range data.Fields {
 		if mcpField.DeobfName == method.Searge {
 			fields = append(fields, mcpField)
@@ -87,7 +88,7 @@ func findField(method SRGField, data MCPData) []FieldData {
 	return fields
 }
 
-func createFieldInfo(fieldSrg SRGField, fieldData []FieldData) ([]FieldInfo, error) {
+func createFieldInfo(fieldSrg SRGField, fieldData []common.FieldData) ([]FieldInfo, error) {
 	if len(fieldData) == 0 {
 		return []FieldInfo{}, errors.New("Failed to find field data for " + fieldSrg.Searge + fieldSrg.Desc)
 	}

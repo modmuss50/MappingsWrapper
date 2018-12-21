@@ -1,8 +1,10 @@
-package mcpwrapper
+package mcp
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/modmuss50/MappingsWrapper/common"
+	"github.com/modmuss50/MappingsWrapper/utils"
 	"gopkg.in/src-d/go-git.v4"
 	"io"
 	"log"
@@ -11,9 +13,9 @@ import (
 	"path/filepath"
 )
 
-func getMCPConfigData(version string) (MCPData, error) {
-	var data MCPData
-	if !fileExists(mcpConfigSRGLocation(version)) {
+func getMCPConfigData(version string) (common.MapppingData, error) {
+	var data common.MapppingData
+	if !utils.FileExists(mcpConfigSRGLocation(version)) {
 		err := prepareMCPConfig(version)
 		if err != nil {
 			return data, err
@@ -25,13 +27,13 @@ func getMCPConfigData(version string) (MCPData, error) {
 
 func prepareMCPConfig(version string) error {
 
-	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", version))
+	extractedPath := filepath.Join(common.SRGDataDir, fmt.Sprintf("mcp-%s-config", version))
 
 	fmt.Println("Cloning MCP Config")
 
 	//Handles errors that can be caused if a previous build failed
-	if fileExists(extractedPath) {
-		deleteDir(extractedPath)
+	if utils.FileExists(extractedPath) {
+		utils.DeleteDir(extractedPath)
 	}
 
 	_, err := git.PlainClone(extractedPath, false, &git.CloneOptions{
@@ -66,14 +68,14 @@ func prepareMCPConfig(version string) error {
 	fmt.Println(srgPath)
 	fmt.Println(mcpConfigSRGLocation(version))
 
-	return copyFile(srgPath, mcpConfigSRGLocation(version))
+	return utils.CopyFile(srgPath, mcpConfigSRGLocation(version))
 }
 
 func mcpConfigSRGLocation(version string) string {
-	extractedPath := filepath.Join(SRGDataDir, fmt.Sprintf("mcp-%s-config", version), "joined.srg")
+	extractedPath := filepath.Join(common.SRGDataDir, fmt.Sprintf("mcp-%s-config", version), "joined.srg")
 	return extractedPath
 }
 
-func buildMCPConfigData(version string) MCPData {
+func buildMCPConfigData(version string) common.MapppingData {
 	return ReadMCPData(mcpConfigSRGLocation(version))
 }
